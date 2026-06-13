@@ -17,3 +17,16 @@ a, b = 1, "2"
 a, b = 1, "2"
 sum = a + int(b)   # Convert string "2" to integer
 print(sum)         # Output: 3
+
+
+# type conversion
+a = 2
+b = 4.25
+print(a + b)
+
+# type casting
+a, b = 1, "2"
+c = int(b)
+print(a + c)
+print(type(c))
+
