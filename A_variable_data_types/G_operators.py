@@ -39,3 +39,4 @@ b = False
 print(not a)       # False
 print(a and b)     # False
 print(a or b)      # True
+
