@@ -1,0 +1,2880 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Master Guide</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0f14;
+            --surface: #13151c;
+            --surface2: #1a1d27;
+            --border: #232636;
+            --accent: #00e5a0;
+            --accent2: #7c6af7;
+            --accent3: #f7c948;
+            --accent4: #f76c6c;
+            --text: #e2e8f0;
+            --muted: #6b7280;
+            --code-bg: #0a0c10;
+            --sidebar-w: 280px;
+            --radius: 10px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* ── SCROLLBAR ── */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
+        /* ── SIDEBAR ── */
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+        }
+
+        #sidebar::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .sidebar-logo {
+            padding: 24px 20px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-logo .logo-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #00e5a020, #7c6af720);
+            border: 1px solid var(--accent);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--accent);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-logo .snake-icon {
+            font-size: 18px;
+        }
+
+        .sidebar-logo p {
+            margin-top: 10px;
+            font-size: 11px;
+            color: var(--muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .sidebar-nav {
+            padding: 12px 12px;
+            flex: 1;
+        }
+
+        .nav-section-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 8px 8px 4px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 10px;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item:hover {
+            color: var(--text);
+            background: var(--surface2);
+        }
+
+        .nav-item.active {
+            color: var(--accent);
+            background: linear-gradient(90deg, #00e5a015, transparent);
+            border-left: 2px solid var(--accent);
+            padding-left: 8px;
+        }
+
+        .nav-item .nav-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--muted);
+            min-width: 20px;
+        }
+
+        .nav-item.active .nav-num {
+            color: var(--accent);
+        }
+
+        .nav-item .nav-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--border);
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-dot {
+            background: var(--accent);
+        }
+
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .sidebar-footer span {
+            color: var(--accent);
+        }
+
+        /* ── MOBILE TOGGLE ── */
+        #menuBtn {
+            display: none;
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 200;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            width: 42px;
+            height: 42px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+
+        #menuBtn span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: var(--text);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        #menuBtn.open span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        #menuBtn.open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        #menuBtn.open span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #00000080;
+            z-index: 99;
+        }
+
+        /* ── MAIN CONTENT ── */
+        #main {
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+            transition: margin 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ── HERO ── */
+        .hero {
+            padding: 80px 60px 60px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #00e5a010 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: 200px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, #7c6af710 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-eyebrow {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--accent);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hero-eyebrow::before {
+            content: '';
+            display: inline-block;
+            width: 30px;
+            height: 1px;
+            background: var(--accent);
+        }
+
+        .hero h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(32px, 5vw, 56px);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 .hl {
+            color: var(--accent);
+        }
+
+        .hero h1 .hl2 {
+            color: var(--accent2);
+        }
+
+        .hero-desc {
+            font-size: 16px;
+            color: var(--muted);
+            max-width: 560px;
+            margin-bottom: 36px;
+            line-height: 1.8;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .stat-num .unit {
+            font-size: 14px;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ── PROGRESS BAR ── */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-w);
+            right: 0;
+            height: 2px;
+            background: var(--border);
+            z-index: 50;
+            transition: left 0.35s;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        /* ── CONTENT AREA ── */
+        .content {
+            padding: 0 60px 80px;
+        }
+
+        /* ── TOPIC SECTION ── */
+        .topic-section {
+            padding-top: 70px;
+            margin-bottom: 8px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .topic-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .topic-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+
+        .topic-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--accent);
+            background: #00e5a015;
+            border: 1px solid #00e5a030;
+            padding: 4px 10px;
+            border-radius: 4px;
+            min-width: fit-content;
+            margin-top: 6px;
+            letter-spacing: 1px;
+        }
+
+        .topic-title-block {}
+
+        .topic-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(20px, 3vw, 30px);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 8px;
+        }
+
+        .topic-tagline {
+            font-size: 14px;
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        /* ── EXPLANATION CARD ── */
+        .explain-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .explain-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--accent), var(--accent2));
+        }
+
+        .card-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--accent);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .explain-card p {
+            color: #a0aec0;
+            line-height: 1.8;
+        }
+
+        /* ── CODE BLOCK ── */
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .code-block:hover {
+            border-color: #2d3248;
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background: #0f1118;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .code-dots span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .code-dots span:nth-child(1) {
+            background: #f76c6c;
+        }
+
+        .code-dots span:nth-child(2) {
+            background: var(--accent3);
+        }
+
+        .code-dots span:nth-child(3) {
+            background: #00e5a0;
+        }
+
+        .code-lang {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+            letter-spacing: 1px;
+        }
+
+        .copy-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .copy-btn.copied {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        pre {
+            padding: 20px 24px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #c9d1d9;
+            tab-size: 4;
+        }
+
+        /* Syntax highlighting */
+        .kw {
+            color: #c792ea;
+        }
+
+        /* keyword */
+        .fn {
+            color: #82aaff;
+        }
+
+        /* function */
+        .str {
+            color: #c3e88d;
+        }
+
+        /* string */
+        .num {
+            color: #f78c6c;
+        }
+
+        /* number */
+        .cm {
+            color: #546e7a;
+            font-style: italic;
+        }
+
+        /* comment */
+        .cls {
+            color: var(--accent3);
+        }
+
+        /* class */
+        .op {
+            color: var(--accent);
+        }
+
+        /* operator */
+        .bl {
+            color: #89ddff;
+        }
+
+        /* builtin */
+        .dec {
+            color: #f76c6c;
+        }
+
+        /* decorator */
+
+        /* ── KEY CONCEPTS TABLE ── */
+        .concept-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+            font-size: 13px;
+        }
+
+        .concept-table thead tr {
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .concept-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--accent);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .concept-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            color: #a0aec0;
+            vertical-align: top;
+        }
+
+        .concept-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .concept-table tr:hover td {
+            background: var(--surface2);
+        }
+
+        .concept-table .tag {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--accent2);
+            white-space: nowrap;
+        }
+
+        .concept-table td:first-child {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .table-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        /* ── CHALLENGE CARDS ── */
+        .challenges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .challenge-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            transition: all 0.25s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .challenge-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #00e5a005, #7c6af705);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .challenge-card:hover {
+            border-color: var(--accent2);
+            transform: translateY(-2px);
+        }
+
+        .challenge-card:hover::after {
+            opacity: 1;
+        }
+
+        .challenge-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--accent3);
+            background: #f7c94810;
+            border: 1px solid #f7c94830;
+            padding: 3px 10px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .challenge-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .challenge-desc {
+            font-size: 12.5px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .challenge-expand {
+            margin-top: 14px;
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--accent2);
+            padding: 6px 14px;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .challenge-expand:hover {
+            background: var(--accent2);
+            color: #fff;
+            border-color: var(--accent2);
+        }
+
+        .challenge-code {
+            display: none;
+            margin-top: 14px;
+        }
+
+        .challenge-code.open {
+            display: block;
+        }
+
+        /* ── SECTION LABEL ── */
+        .section-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 32px 0 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ── QUICK REF ── */
+        .quickref-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .qr-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 16px;
+            transition: all 0.2s;
+        }
+
+        .qr-card:hover {
+            border-color: var(--accent);
+        }
+
+        .qr-topic {
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .qr-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--accent);
+            background: var(--code-bg);
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        /* ── DIVIDER ── */
+        .topic-divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 0;
+        }
+
+        /* ── SEARCH ── */
+        .search-wrap {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 12px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent);
+        }
+
+        .search-input::placeholder {
+            color: var(--muted);
+        }
+
+        /* ── BACK TO TOP ── */
+        #backTop {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 44px;
+            height: 44px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s;
+            z-index: 50;
+            font-size: 18px;
+            color: var(--accent);
+        }
+
+        #backTop.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #backTop:hover {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+        }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .hero-eyebrow {
+            animation: fadeSlideIn 0.6s ease both;
+        }
+
+        .hero h1 {
+            animation: fadeSlideIn 0.6s 0.1s ease both;
+        }
+
+        .hero-desc {
+            animation: fadeSlideIn 0.6s 0.2s ease both;
+        }
+
+        .hero-stats {
+            animation: fadeSlideIn 0.6s 0.3s ease both;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            background: var(--accent);
+            animation: blink 1s infinite;
+            margin-left: 2px;
+            vertical-align: middle;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            :root {
+                --sidebar-w: 0px;
+            }
+
+            #sidebar {
+                transform: translateX(-280px);
+                width: 280px;
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+            }
+
+            #menuBtn {
+                display: flex;
+            }
+
+            #overlay.show {
+                display: block;
+            }
+
+            #main {
+                margin-left: 0;
+            }
+
+            .progress-bar {
+                left: 0;
+            }
+
+            .hero {
+                padding: 70px 24px 48px;
+            }
+
+            .content {
+                padding: 0 24px 60px;
+            }
+
+            .hero-stats {
+                gap: 20px;
+            }
+
+            .challenges-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .hero h1 {
+                font-size: 26px;
+            }
+
+            .topic-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            pre {
+                font-size: 12px;
+                padding: 16px;
+            }
+
+            .quickref-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            ::before,
+            ::after {
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-pill"><span class="snake-icon">🐍</span> Python Guide</div>
+            <p>// 12 topics · complete notes</p>
+        </div>
+        <div class="search-wrap">
+            <input class="search-input" id="searchInput" placeholder="Search topics..." autocomplete="off">
+        </div>
+        <div class="sidebar-nav" id="navList">
+            <div class="nav-section-label">Core Concepts</div>
+            <a class="nav-item active" href="#topic1"><span class="nav-num">01</span><span
+                    class="nav-dot"></span>Variables</a>
+            <a class="nav-item" href="#topic2"><span class="nav-num">02</span><span class="nav-dot"></span>Data Types &
+                Casting</a>
+            <a class="nav-item" href="#topic3"><span class="nav-num">03</span><span class="nav-dot"></span>Strings</a>
+            <a class="nav-item" href="#topic4"><span class="nav-num">04</span><span class="nav-dot"></span>Lists</a>
+            <a class="nav-item" href="#topic5"><span class="nav-num">05</span><span
+                    class="nav-dot"></span>Conditionals</a>
+            <a class="nav-item" href="#topic6"><span class="nav-num">06</span><span class="nav-dot"></span>Loops</a>
+            <a class="nav-item" href="#topic7"><span class="nav-num">07</span><span class="nav-dot"></span>Functions</a>
+            <div class="nav-section-label" style="margin-top:8px">OOP</div>
+            <a class="nav-item" href="#topic8"><span class="nav-num">08</span><span class="nav-dot"></span>Classes &
+                Objects</a>
+            <a class="nav-item" href="#topic9"><span class="nav-num">09</span><span
+                    class="nav-dot"></span>Encapsulation</a>
+            <a class="nav-item" href="#topic10"><span class="nav-num">10</span><span
+                    class="nav-dot"></span>Inheritance</a>
+            <a class="nav-item" href="#topic11"><span class="nav-num">11</span><span
+                    class="nav-dot"></span>Polymorphism</a>
+            <a class="nav-item" href="#topic12"><span class="nav-num">12</span><span
+                    class="nav-dot"></span>Abstraction</a>
+            <div class="nav-section-label" style="margin-top:8px">Reference</div>
+            <a class="nav-item" href="#quickref"><span class="nav-num">QR</span><span class="nav-dot"></span>Quick
+                Reference</a>
+        </div>
+        <div class="sidebar-footer">
+            <span>12</span> topics · <span>36+</span> challenges
+        </div>
+    </nav>
+
+    <!-- MENU BUTTON (mobile) -->
+    <button id="menuBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
+    <div id="overlay"></div>
+
+    <!-- PROGRESS BAR -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <!-- MAIN -->
+    <main id="main">
+
+        <!-- HERO -->
+        <div class="hero">
+            <div class="hero-eyebrow">Complete Tutorial</div>
+            <h1><span class="hl">Python</span><br><span class="hl2">Master</span> Guide<span class="cursor"></span></h1>
+            <p class="hero-desc">Everything you need to master Python — from variables to OOP. With syntax, examples,
+                and hands-on challenges for every topic.</p>
+            <div class="hero-stats">
+                <div class="stat">
+                    <div class="stat-num">12<span class="unit"> topics</span></div>
+                    <div class="stat-label">Covered</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">36<span class="unit">+</span></div>
+                    <div class="stat-label">Challenges</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">100<span class="unit">+</span></div>
+                    <div class="stat-label">Code Examples</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+
+            <!-- ╔══════════════════════════════╗ -->
+            <!-- ║  TOPIC 1: VARIABLES          ║ -->
+            <!-- ╚══════════════════════════════╝ -->
+            <section class="topic-section" id="topic1">
+                <div class="topic-header">
+                    <div class="topic-number">TOPIC 01</div>
+                    <div class="topic-title-block">
+                        <div class="topic-title">Python Variables</div>
+                        <div class="topic-tagline">Containers that store data in memory</div>
+                    </div>
+                </div>
+
+                <div class="explain-card">
+                    <div class="card-label">📖 Explanation</div>
+                    <p>Variables are like <strong style="color:var(--accent)">labeled jars</strong> where you store
+                        different types of items (numbers, text, etc.). You can change what's inside anytime. Python
+                        automatically detects the type — no keyword needed, just use <code
+                            style="color:var(--accent2)">= </code> to assign.</p>
+                </div>
+
+                <div class="section-label">💻 Code Examples</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-dots"><span></span><span></span><span></span></div>
+                        <span class="code-lang">PYTHON</span>
+                        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+                    </div>
+                    <pre><span class="cm"># Creating variables — no keyword needed, just use =</span>
+<span class="cm">name</span>       = <span class="str">"Amit"</span>        <span class="cm"># String variable</span>
+<span class="cm">age</span>        = <span class="num">25</span>            <span class="cm"># Integer variable</span>
+<span class="cm">price</span>      = <span class="num">99.99</span>         <span class="cm"># Float variable</span>
+<span class="cm">is_student</span> = <span class="kw">True</span>          <span class="cm"># Boolean variable</span>
+
+<span class="cm"># Multiple variables in one line</span>
+a, b, c = <span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>
+
+<span class="cm"># Same value to multiple variables</span>
+x = y = z = <span class="num">10</span>
+
+<span class="cm"># Printing variables</span>
+<span class="bl">print</span>(name)   <span class="cm"># Output: Amit</span>
+<span class="bl">print</span>(age)    <span class="cm"># Output: 25</span>
+
+<span class="cm"># Reassigning</span>
+age = <span class="num">26</span>
+<span class="bl">print</span>(age)    <span class="cm"># Output: 26</span>
+
+<span class="cm"># Check variable type</span>
+<span class="bl">print</span>(<span class="bl">type</span>(name))   <span class="cm"># &lt;class 'str'&gt;</span>
+<span class="bl">print</span>(<span class="bl">id</span>(age))     <span class="cm"># Memory address</span></pre>
+                </div>
+
+                <div class="section-label">🔑 Key Concepts</div>
+                <div class="table-wrap">
+                    <table class="concept-table">
+                        <thead>
+                            <tr>
+                                <th>Concept</th>
+                                <th>Explanation</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Dynamic Typing</td>
+                                <td>Python auto-detects type</td>
+                                <td><span class="tag">x = 5</span> → int, <span class="tag">x = "hi"</span> → str</td>
+                            </tr>
+                            <tr>
+                                <td>Case Sensitivity</td>
+                                <td>Upper/lower are different</td>
+                                <td><span class="tag">Name</span> ≠ <span class="tag">name</span></td>
+                            </tr>
+                            <tr>
+                                <td>Naming Rules</td>
+                                <td>Start with letter/_, no spaces</td>
+                                <td>✅ <span class="tag">my_var</span> ❌ <span class="tag">2var</span></td>
+                            </tr>
+                            <tr>
+                                <td>Memory Reference</td>
+                                <td>Variables point to memory</td>
+                                <td><span class="tag">id(var)</span> shows address</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="section-label">🧪 Challenges</div>
+                <div class="challenges-grid">
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 1</div>
+                        <div class="challenge-title">Temperature Converter</div>
+                        <div class="challenge-desc">Create a celsius variable and convert it to Fahrenheit using
+                            (celsius × 9/5) + 32. Print the result.</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre>celsius = <span class="num">32</span>
+fahrenheit = (celsius * <span class="num">9</span>/<span class="num">5</span>) + <span class="num">32</span>
+<span class="bl">print</span>(fahrenheit)   <span class="cm"># Output: 89.6</span></pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 2</div>
+                        <div class="challenge-title">Swap Two Variables</div>
+                        <div class="challenge-desc">Given a = 10, b = 20 — swap their values without using a third
+                            variable.</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre>a = <span class="num">10</span>
+b = <span class="num">20</span>
+a, b = b, a
+<span class="bl">print</span>(a, b)   <span class="cm"># Output: 20 10</span></pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 3</div>
+                        <div class="challenge-title">Variable Type Tracker</div>
+                        <div class="challenge-desc">Create score (int), percentage (float), grade (str). Print each with
+                            its type using type().</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre>score      = <span class="num">85</span>
+percentage = <span class="num">85.5</span>
+grade      = <span class="str">"A"</span>
+
+<span class="bl">print</span>(score,      <span class="bl">type</span>(score))
+<span class="bl">print</span>(percentage, <span class="bl">type</span>(percentage))
+<span class="bl">print</span>(grade,      <span class="bl">type</span>(grade))</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <hr class="topic-divider">
+
+            <!-- TOPIC 2 -->
+            <section class="topic-section" id="topic2">
+                <div class="topic-header">
+                    <div class="topic-number">TOPIC 02</div>
+                    <div class="topic-title-block">
+                        <div class="topic-title">Data Types & Type Casting</div>
+                        <div class="topic-tagline">Converting data from one type to another</div>
+                    </div>
+                </div>
+                <div class="explain-card">
+                    <div class="card-label">📖 Explanation</div>
+                    <p><strong style="color:var(--accent)">Data Types</strong> tell Python what kind of data a variable
+                        holds. <strong style="color:var(--accent2)">Type Casting</strong> is like converting one
+                        currency to another — you change data from one type to another when needed.</p>
+                </div>
+                <div class="section-label">💻 Code Examples</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-dots"><span></span><span></span><span></span></div><span
+                            class="code-lang">PYTHON</span><button class="copy-btn"
+                            onclick="copyCode(this)">copy</button>
+                    </div>
+                    <pre><span class="cm"># Core Data Types</span>
+age       = <span class="num">25</span>         <span class="cm"># int</span>
+height    = <span class="num">5.9</span>        <span class="cm"># float</span>
+name      = <span class="str">"Python"</span>   <span class="cm"># str</span>
+is_active = <span class="kw">True</span>       <span class="cm"># bool</span>
+
+<span class="cm"># TYPE CASTING (Converting)</span>
+num_str   = <span class="str">"100"</span>
+num_int   = <span class="bl">int</span>(num_str)   <span class="cm"># 100</span>
+num       = <span class="num">50</span>
+num_str   = <span class="bl">str</span>(num)       <span class="cm"># "50"</span>
+
+pi        = <span class="num">3.99</span>
+pi_int    = <span class="bl">int</span>(pi)        <span class="cm"># 3  (truncates, not rounds)</span>
+
+x         = <span class="num">10</span>
+x_float   = <span class="bl">float</span>(x)      <span class="cm"># 10.0</span>
+
+<span class="cm"># Boolean to Integer</span>
+<span class="bl">print</span>(<span class="bl">int</span>(<span class="kw">True</span>))   <span class="cm"># 1</span>
+<span class="bl">print</span>(<span class="bl">int</span>(<span class="kw">False</span>))  <span class="cm"># 0</span>
+
+<span class="cm"># Type Checking</span>
+<span class="bl">print</span>(<span class="bl">type</span>(age))       <span class="cm"># &lt;class 'int'&gt;</span>
+<span class="bl">print</span>(<span class="bl">isinstance</span>(age, <span class="bl">int</span>))  <span class="cm"># True</span></pre>
+                </div>
+                <div class="section-label">🔑 Key Concepts</div>
+                <div class="table-wrap">
+                    <table class="concept-table">
+                        <thead>
+                            <tr>
+                                <th>Concept</th>
+                                <th>Explanation</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Implicit Casting</td>
+                                <td>Python auto-converts</td>
+                                <td><span class="tag">10 + 5.5 = 15.5</span></td>
+                            </tr>
+                            <tr>
+                                <td>Explicit Casting</td>
+                                <td>You manually convert</td>
+                                <td><span class="tag">int("100")</span></td>
+                            </tr>
+                            <tr>
+                                <td>Data Loss</td>
+                                <td>float→int loses decimal</td>
+                                <td><span class="tag">int(3.99) = 3</span></td>
+                            </tr>
+                            <tr>
+                                <td>Invalid Casting</td>
+                                <td>Can't convert non-numeric string</td>
+                                <td><span class="tag">int("hello")</span> → Error</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="section-label">🧪 Challenges</div>
+                <div class="challenges-grid">
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 1</div>
+                        <div class="challenge-title">Calculator with Type Casting</div>
+                        <div class="challenge-desc">Take two numbers as string input, convert to integers, add and
+                            print.</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre>num1 = <span class="bl">input</span>(<span class="str">"Enter first number: "</span>)
+num2 = <span class="bl">input</span>(<span class="str">"Enter second number: "</span>)
+result = <span class="bl">int</span>(num1) + <span class="bl">int</span>(num2)
+<span class="bl">print</span>(<span class="str">"Sum:"</span>, result)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 2</div>
+                        <div class="challenge-title">Decimal Truncation</div>
+                        <div class="challenge-desc">Given 123.987 — convert to int, then to string. Print value and
+                            type.</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre>decimal_num = <span class="num">123.987</span>
+as_int = <span class="bl">int</span>(decimal_num)    <span class="cm"># 123</span>
+as_str = <span class="bl">str</span>(as_int)          <span class="cm"># "123"</span>
+<span class="bl">print</span>(as_str, <span class="bl">type</span>(as_str))  <span class="cm"># 123 &lt;class 'str'&gt;</span></pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 3</div>
+                        <div class="challenge-title">Mixed Data Type Challenge</div>
+                        <div class="challenge-desc">a="50", b=25, c=10.5 — convert and combine them step by step.</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre>a = <span class="str">"50"</span>; b = <span class="num">25</span>; c = <span class="num">10.5</span>
+step1 = <span class="bl">int</span>(a) + b     <span class="cm"># 75</span>
+step2 = step1 + c      <span class="cm"># 85.5</span>
+result = <span class="bl">str</span>(step2)
+<span class="bl">print</span>(result)          <span class="cm"># "85.5"</span></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <hr class="topic-divider">
+
+            <!-- TOPIC 3: STRINGS -->
+            <section class="topic-section" id="topic3">
+                <div class="topic-header">
+                    <div class="topic-number">TOPIC 03</div>
+                    <div class="topic-title-block">
+                        <div class="topic-title">Strings</div>
+                        <div class="topic-tagline">Text manipulation — immutable sequences of characters</div>
+                    </div>
+                </div>
+                <div class="explain-card">
+                    <div class="card-label">📖 Explanation</div>
+                    <p>Strings are <strong style="color:var(--accent)">sequences of characters</strong> enclosed in
+                        quotes. They are <strong style="color:var(--accent2)">immutable</strong> — once created they
+                        cannot be changed. Python provides rich methods for slicing, joining, searching, and
+                        transforming strings.</p>
+                </div>
+                <div class="section-label">💻 Code Examples</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-dots"><span></span><span></span><span></span></div><span
+                            class="code-lang">PYTHON</span><button class="copy-btn"
+                            onclick="copyCode(this)">copy</button>
+                    </div>
+                    <pre><span class="cm"># Creating Strings</span>
+single     = <span class="str">'Hello'</span>
+double     = <span class="str">"World"</span>
+multi_line = <span class="str">"""This is
+a multi-line string"""</span>
+
+<span class="cm"># Concatenation & Repetition</span>
+full_name = <span class="str">"Amit"</span> + <span class="str">" "</span> + <span class="str">"Kumar"</span>
+<span class="bl">print</span>(<span class="str">"Ha"</span> * <span class="num">3</span>)            <span class="cm"># "HaHaHa"</span>
+
+<span class="cm"># Indexing & Slicing</span>
+text = <span class="str">"Python Programming"</span>
+<span class="bl">print</span>(text[<span class="num">0</span>])              <span class="cm"># 'P'</span>
+<span class="bl">print</span>(text[-<span class="num">1</span>])             <span class="cm"># 'g'</span>
+<span class="bl">print</span>(text[<span class="num">0</span>:<span class="num">6</span>])            <span class="cm"># "Python"</span>
+<span class="bl">print</span>(text[::<span class="num">2</span>])            <span class="cm"># every 2nd char</span>
+<span class="bl">print</span>(text[::-<span class="num">1</span>])           <span class="cm"># reversed</span>
+
+<span class="cm"># Essential String Methods</span>
+s = <span class="str">"  Hello Python World  "</span>
+<span class="bl">print</span>(s.upper())            <span class="cm"># "  HELLO PYTHON WORLD  "</span>
+<span class="bl">print</span>(s.lower())            <span class="cm"># "  hello python world  "</span>
+<span class="bl">print</span>(s.strip())            <span class="cm"># "Hello Python World"</span>
+<span class="bl">print</span>(s.find(<span class="str">"Python"</span>))    <span class="cm"># 9</span>
+<span class="bl">print</span>(s.replace(<span class="str">"Python"</span>, <span class="str">"Java"</span>))
+words = s.strip().split()   <span class="cm"># ['Hello', 'Python', 'World']</span>
+
+<span class="cm"># Joining</span>
+result = <span class="str">"-"</span>.join([<span class="str">"Hello"</span>, <span class="str">"World"</span>])  <span class="cm"># "Hello-World"</span>
+
+<span class="cm"># f-strings (modern formatting)</span>
+name = <span class="str">"Amit"</span>; age = <span class="num">25</span>
+<span class="bl">print</span>(<span class="str">f"My name is {name} and I am {age} years old"</span>)
+
+<span class="cm"># Checking content</span>
+<span class="bl">print</span>(<span class="str">"123"</span>.isdigit())    <span class="cm"># True</span>
+<span class="bl">print</span>(<span class="str">"abc"</span>.isalpha())    <span class="cm"># True</span>
+<span class="bl">print</span>(<span class="str">"Python"</span> <span class="kw">in</span> text)  <span class="cm"># True</span></pre>
+                </div>
+                <div class="section-label">🔑 Key Concepts</div>
+                <div class="table-wrap">
+                    <table class="concept-table">
+                        <thead>
+                            <tr>
+                                <th>Concept</th>
+                                <th>Explanation</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Immutable</td>
+                                <td>Cannot change individual characters</td>
+                                <td><span class="tag">s[0] = 'a'</span> → Error</td>
+                            </tr>
+                            <tr>
+                                <td>Escape Chars</td>
+                                <td>Special characters with backslash</td>
+                                <td><span class="tag">\n</span> newline, <span class="tag">\t</span> tab</td>
+                            </tr>
+                            <tr>
+                                <td>String Methods</td>
+                                <td>Return new strings (original unchanged)</td>
+                                <td><span class="tag">upper()</span>, <span class="tag">strip()</span></td>
+                            </tr>
+                            <tr>
+                                <td>Slicing</td>
+                                <td>Extract portion of string</td>
+                                <td><span class="tag">[start:stop:step]</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="section-label">🧪 Challenges</div>
+                <div class="challenges-grid">
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 1</div>
+                        <div class="challenge-title">Palindrome Checker</div>
+                        <div class="challenge-desc">Check if a string reads the same forwards and backwards, ignoring
+                            case. "Radar" → palindrome.</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre>user_input = <span class="bl">input</span>(<span class="str">"Enter a word: "</span>)
+word = user_input.lower()
+<span class="kw">if</span> word == word[::-<span class="num">1</span>]:
+    <span class="bl">print</span>(<span class="str">f'"{user_input}" is a palindrome!'</span>)
+<span class="kw">else</span>:
+    <span class="bl">print</span>(<span class="str">f'"{user_input}" is NOT a palindrome'</span>)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 2</div>
+                        <div class="challenge-title">Vowel Counter</div>
+                        <div class="challenge-desc">Count how many vowels (a,e,i,o,u) appear in a sentence — both upper
+                            and lower case.</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre>sentence = <span class="bl">input</span>(<span class="str">"Enter a sentence: "</span>)
+vowels = <span class="str">"aeiou"</span>
+count = <span class="bl">sum</span>(<span class="num">1</span> <span class="kw">for</span> ch <span class="kw">in</span> sentence.lower() <span class="kw">if</span> ch <span class="kw">in</span> vowels)
+<span class="bl">print</span>(<span class="str">f"Vowel count: {count}"</span>)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 3</div>
+                        <div class="challenge-title">Basic Email Validator</div>
+                        <div class="challenge-desc">Check if email has '@', has '.' after '@', and has no spaces.</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre>email = <span class="bl">input</span>(<span class="str">"Enter email: "</span>)
+at_pos = email.find(<span class="str">'@'</span>)
+dot_pos = email.find(<span class="str">'.'</span>, at_pos)
+<span class="kw">if</span> at_pos > <span class="num">0</span> <span class="kw">and</span> dot_pos > at_pos <span class="kw">and</span> <span class="str">' '</span> <span class="kw">not in</span> email:
+    <span class="bl">print</span>(<span class="str">"✅ Valid Email"</span>)
+<span class="kw">else</span>:
+    <span class="bl">print</span>(<span class="str">"❌ Invalid Email"</span>)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <hr class="topic-divider">
+
+            <!-- TOPIC 4: LISTS -->
+            <section class="topic-section" id="topic4">
+                <div class="topic-header">
+                    <div class="topic-number">TOPIC 04</div>
+                    <div class="topic-title-block">
+                        <div class="topic-title">Lists</div>
+                        <div class="topic-tagline">Ordered, mutable collections — your Python shopping cart</div>
+                    </div>
+                </div>
+                <div class="explain-card">
+                    <div class="card-label">📖 Explanation</div>
+                    <p>Lists are <strong style="color:var(--accent)">ordered, mutable collections</strong> that can hold
+                        any type of data. Think of them as a shopping list — you can add, remove, or change items
+                        anytime. They grow and shrink automatically.</p>
+                </div>
+                <div class="section-label">💻 Code Examples</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-dots"><span></span><span></span><span></span></div><span
+                            class="code-lang">PYTHON</span><button class="copy-btn"
+                            onclick="copyCode(this)">copy</button>
+                    </div>
+                    <pre><span class="cm"># Creating Lists</span>
+numbers    = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>]
+mixed      = [<span class="num">1</span>, <span class="str">"Hello"</span>, <span class="num">3.14</span>, <span class="kw">True</span>]
+range_list = <span class="bl">list</span>(<span class="bl">range</span>(<span class="num">5</span>))      <span class="cm"># [0, 1, 2, 3, 4]</span>
+
+<span class="cm"># Accessing</span>
+fruits = [<span class="str">'apple'</span>, <span class="str">'banana'</span>, <span class="str">'cherry'</span>, <span class="str">'date'</span>]
+<span class="bl">print</span>(fruits[<span class="num">0</span>])     <span class="cm"># 'apple'</span>
+<span class="bl">print</span>(fruits[-<span class="num">1</span>])    <span class="cm"># 'date'</span>
+<span class="bl">print</span>(fruits[<span class="num">1</span>:<span class="num">3</span>])   <span class="cm"># ['banana', 'cherry']</span>
+<span class="bl">print</span>(fruits[::-<span class="num">1</span>])  <span class="cm"># reverse</span>
+
+<span class="cm"># Adding elements</span>
+numbers.append(<span class="num">4</span>)           <span class="cm"># Add at end</span>
+numbers.insert(<span class="num">1</span>, <span class="num">10</span>)       <span class="cm"># Insert at index</span>
+numbers.extend([<span class="num">5</span>, <span class="num">6</span>])      <span class="cm"># Add multiple</span>
+
+<span class="cm"># Removing elements</span>
+numbers.remove(<span class="num">10</span>)          <span class="cm"># Remove first occurrence</span>
+popped = numbers.pop()       <span class="cm"># Remove & return last</span>
+numbers.pop(<span class="num">2</span>)               <span class="cm"># Remove at index</span>
+
+<span class="cm"># Other Methods</span>
+numbers = [<span class="num">3</span>, <span class="num">1</span>, <span class="num">4</span>, <span class="num">1</span>, <span class="num">5</span>, <span class="num">9</span>]
+numbers.sort()               <span class="cm"># [1, 1, 3, 4, 5, 9]</span>
+numbers.sort(reverse=<span class="kw">True</span>)  <span class="cm"># [9, 5, 4, 3, 1, 1]</span>
+<span class="bl">print</span>(numbers.count(<span class="num">1</span>))     <span class="cm"># 2</span>
+<span class="bl">print</span>(<span class="bl">len</span>(numbers))          <span class="cm"># 6</span>
+
+<span class="cm"># List Comprehension</span>
+squares = [x**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="bl">range</span>(<span class="num">1</span>, <span class="num">6</span>)]         <span class="cm"># [1, 4, 9, 16, 25]</span>
+evens   = [x <span class="kw">for</span> x <span class="kw">in</span> <span class="bl">range</span>(<span class="num">1</span>, <span class="num">11</span>) <span class="kw">if</span> x%<span class="num">2</span>==<span class="num">0</span>]  <span class="cm"># [2, 4, 6, 8, 10]</span>
+
+<span class="cm"># Enumerate (pythonic looping with index)</span>
+<span class="kw">for</span> index, fruit <span class="kw">in</span> <span class="bl">enumerate</span>(fruits):
+    <span class="bl">print</span>(<span class="str">f"{index}: {fruit}"</span>)</pre>
+                </div>
+                <div class="section-label">🧪 Challenges</div>
+                <div class="challenges-grid">
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 1</div>
+                        <div class="challenge-title">Even & Odd Separator</div>
+                        <div class="challenge-desc">Create numbers 1–20, separate into evens and odds lists. Print both.
+                        </div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre>evens = [x <span class="kw">for</span> x <span class="kw">in</span> <span class="bl">range</span>(<span class="num">1</span>, <span class="num">21</span>) <span class="kw">if</span> x % <span class="num">2</span> == <span class="num">0</span>]
+odds  = [x <span class="kw">for</span> x <span class="kw">in</span> <span class="bl">range</span>(<span class="num">1</span>, <span class="num">21</span>) <span class="kw">if</span> x % <span class="num">2</span> != <span class="num">0</span>]
+<span class="bl">print</span>(<span class="str">"Evens:"</span>, evens)
+<span class="bl">print</span>(<span class="str">"Odds:"</span>,  odds)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 2</div>
+                        <div class="challenge-title">Reverse Without reverse()</div>
+                        <div class="challenge-desc">Reverse [10,20,30,40,50,60,70] without reverse() or [::-1]. Use a
+                            loop.</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre>my_list = [<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>, <span class="num">50</span>, <span class="num">60</span>, <span class="num">70</span>]
+reversed_list = []
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bl">range</span>(<span class="bl">len</span>(my_list)-<span class="num">1</span>, -<span class="num">1</span>, -<span class="num">1</span>):
+    reversed_list.append(my_list[i])
+<span class="bl">print</span>(reversed_list)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 3</div>
+                        <div class="challenge-title">Remove Duplicates</div>
+                        <div class="challenge-desc">From [1,2,2,3,4,4,4,5,6,6,7] create a unique-elements list
+                            preserving order.</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre>numbers = [<span class="num">1</span>,<span class="num">2</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>,<span class="num">4</span>,<span class="num">4</span>,<span class="num">5</span>,<span class="num">6</span>,<span class="num">6</span>,<span class="num">7</span>]
+unique = []
+<span class="kw">for</span> n <span class="kw">in</span> numbers:
+    <span class="kw">if</span> n <span class="kw">not in</span> unique:
+        unique.append(n)
+<span class="bl">print</span>(unique)  <span class="cm"># [1, 2, 3, 4, 5, 6, 7]</span></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <hr class="topic-divider">
+
+            <!-- TOPIC 5: CONDITIONALS -->
+            <section class="topic-section" id="topic5">
+                <div class="topic-header">
+                    <div class="topic-number">TOPIC 05</div>
+                    <div class="topic-title-block">
+                        <div class="topic-title">Conditional Statements</div>
+                        <div class="topic-tagline">Decision making — if, elif, else</div>
+                    </div>
+                </div>
+                <div class="explain-card">
+                    <div class="card-label">📖 Explanation</div>
+                    <p>Conditional statements help your program <strong style="color:var(--accent)">make
+                            decisions</strong> based on conditions. Like a traffic light — if green go; if red stop.
+                        Python uses <strong style="color:var(--accent2)">indentation</strong> (4 spaces) to define code
+                        blocks.</p>
+                </div>
+                <div class="section-label">💻 Code Examples</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-dots"><span></span><span></span><span></span></div><span
+                            class="code-lang">PYTHON</span><button class="copy-btn"
+                            onclick="copyCode(this)">copy</button>
+                    </div>
+                    <pre><span class="cm"># if-elif-else</span>
+score = <span class="num">85</span>
+<span class="kw">if</span> score >= <span class="num">90</span>:
+    grade = <span class="str">"A"</span>
+<span class="kw">elif</span> score >= <span class="num">80</span>:
+    grade = <span class="str">"B"</span>
+<span class="kw">elif</span> score >= <span class="num">70</span>:
+    grade = <span class="str">"C"</span>
+<span class="kw">else</span>:
+    grade = <span class="str">"F"</span>
+<span class="bl">print</span>(<span class="str">f"Grade: {grade}"</span>)   <span class="cm"># B</span>
+
+<span class="cm"># Logical Operators</span>
+age, citizen = <span class="num">25</span>, <span class="kw">True</span>
+<span class="kw">if</span> age >= <span class="num">18</span> <span class="kw">and</span> citizen:
+    <span class="bl">print</span>(<span class="str">"Eligible to vote"</span>)
+
+day = <span class="str">"Sunday"</span>
+<span class="kw">if</span> day == <span class="str">"Saturday"</span> <span class="kw">or</span> day == <span class="str">"Sunday"</span>:
+    <span class="bl">print</span>(<span class="str">"Weekend!"</span>)
+
+<span class="cm"># Ternary (one-line if-else)</span>
+status = <span class="str">"Adult"</span> <span class="kw">if</span> age >= <span class="num">18</span> <span class="kw">else</span> <span class="str">"Minor"</span>
+
+<span class="cm"># Membership check</span>
+fruits = [<span class="str">'apple'</span>, <span class="str">'banana'</span>]
+<span class="kw">if</span> <span class="str">'apple'</span> <span class="kw">in</span> fruits:
+    <span class="bl">print</span>(<span class="str">"Found!"</span>)
+
+<span class="cm"># Nested if</span>
+age, has_license = <span class="num">25</span>, <span class="kw">True</span>
+<span class="kw">if</span> age >= <span class="num">18</span>:
+    <span class="kw">if</span> has_license:
+        <span class="bl">print</span>(<span class="str">"You can drive"</span>)
+    <span class="kw">else</span>:
+        <span class="bl">print</span>(<span class="str">"Get a license first"</span>)
+<span class="kw">else</span>:
+    <span class="bl">print</span>(<span class="str">"Too young to drive"</span>)</pre>
+                </div>
+                <div class="section-label">🧪 Challenges</div>
+                <div class="challenges-grid">
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 1</div>
+                        <div class="challenge-title">Leap Year Checker</div>
+                        <div class="challenge-desc">Divisible by 4 AND (not divisible by 100 OR divisible by 400).</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre>year = <span class="bl">int</span>(<span class="bl">input</span>(<span class="str">"Enter year: "</span>))
+<span class="kw">if</span> (year % <span class="num">4</span> == <span class="num">0</span> <span class="kw">and</span> year % <span class="num">100</span> != <span class="num">0</span>) <span class="kw">or</span> year % <span class="num">400</span> == <span class="num">0</span>:
+    <span class="bl">print</span>(<span class="str">"✅ Leap Year"</span>)
+<span class="kw">else</span>:
+    <span class="bl">print</span>(<span class="str">"❌ Not a Leap Year"</span>)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 2</div>
+                        <div class="challenge-title">Grade + Attendance</div>
+                        <div class="challenge-desc">Grade based on marks AND attendance ≥ 75%. Below attendance reduces
+                            grade by one level.</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre>marks = <span class="bl">int</span>(<span class="bl">input</span>(<span class="str">"Marks: "</span>))
+att   = <span class="bl">int</span>(<span class="bl">input</span>(<span class="str">"Attendance %: "</span>))
+full  = att >= <span class="num">75</span>
+<span class="kw">if</span> marks >= <span class="num">90</span>: g = <span class="str">"A+"</span> <span class="kw">if</span> full <span class="kw">else</span> <span class="str">"A"</span>
+<span class="kw">elif</span> marks >= <span class="num">80</span>: g = <span class="str">"A"</span>  <span class="kw">if</span> full <span class="kw">else</span> <span class="str">"B"</span>
+<span class="kw">elif</span> marks >= <span class="num">70</span>: g = <span class="str">"B"</span>  <span class="kw">if</span> full <span class="kw">else</span> <span class="str">"C"</span>
+<span class="kw">elif</span> marks >= <span class="num">60</span>: g = <span class="str">"C"</span>  <span class="kw">if</span> full <span class="kw">else</span> <span class="str">"D"</span>
+<span class="kw">else</span>: g = <span class="str">"Fail"</span>
+<span class="bl">print</span>(<span class="str">f"Grade: {g}"</span>)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 3</div>
+                        <div class="challenge-title">Login System</div>
+                        <div class="challenge-desc">Check username then password. Give specific error messages. Limit to
+                            3 attempts.</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre>correct_user, correct_pass = <span class="str">"admin"</span>, <span class="str">"1234"</span>
+<span class="kw">for</span> attempt <span class="kw">in</span> <span class="bl">range</span>(<span class="num">3</span>):
+    u = <span class="bl">input</span>(<span class="str">"Username: "</span>)
+    p = <span class="bl">input</span>(<span class="str">"Password: "</span>)
+    <span class="kw">if</span> u != correct_user:
+        <span class="bl">print</span>(<span class="str">"❌ Invalid Username"</span>)
+    <span class="kw">elif</span> p != correct_pass:
+        <span class="bl">print</span>(<span class="str">"❌ Invalid Password"</span>)
+    <span class="kw">else</span>:
+        <span class="bl">print</span>(<span class="str">"✅ Login Successful!"</span>)
+        <span class="kw">break</span>
+<span class="kw">else</span>:
+    <span class="bl">print</span>(<span class="str">"🔒 Account locked"</span>)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <hr class="topic-divider">
+
+            <!-- TOPIC 6: LOOPS -->
+            <section class="topic-section" id="topic6">
+                <div class="topic-header">
+                    <div class="topic-number">TOPIC 06</div>
+                    <div class="topic-title-block">
+                        <div class="topic-title">Loops — For & While</div>
+                        <div class="topic-tagline">Repeat code efficiently — break, continue, else</div>
+                    </div>
+                </div>
+                <div class="explain-card">
+                    <div class="card-label">📖 Explanation</div>
+                    <p>Loops allow you to <strong style="color:var(--accent)">repeat code multiple times</strong>.
+                        <strong style="color:var(--accent2)">for loop</strong> iterates over sequences (known count).
+                        <strong style="color:var(--accent3)">while loop</strong> runs until a condition becomes false
+                        (unknown count).</p>
+                </div>
+                <div class="section-label">💻 Code Examples</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-dots"><span></span><span></span><span></span></div><span
+                            class="code-lang">PYTHON</span><button class="copy-btn"
+                            onclick="copyCode(this)">copy</button>
+                    </div>
+                    <pre><span class="cm"># ── FOR LOOP ──</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bl">range</span>(<span class="num">5</span>):
+    <span class="bl">print</span>(i)           <span class="cm"># 0 1 2 3 4</span>
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bl">range</span>(<span class="num">1</span>, <span class="num">11</span>, <span class="num">2</span>):
+    <span class="bl">print</span>(i)           <span class="cm"># 1 3 5 7 9</span>
+
+<span class="cm"># Loop over list</span>
+<span class="kw">for</span> fruit <span class="kw">in</span> [<span class="str">'apple'</span>, <span class="str">'banana'</span>]:
+    <span class="bl">print</span>(fruit)
+
+<span class="cm"># Loop over dict</span>
+student = {<span class="str">'name'</span>: <span class="str">'Amit'</span>, <span class="str">'age'</span>: <span class="num">25</span>}
+<span class="kw">for</span> key, value <span class="kw">in</span> student.items():
+    <span class="bl">print</span>(<span class="str">f"{key}: {value}"</span>)
+
+<span class="cm"># Zip multiple lists</span>
+names = [<span class="str">'Amit'</span>, <span class="str">'Raj'</span>]; ages = [<span class="num">25</span>, <span class="num">30</span>]
+<span class="kw">for</span> name, age <span class="kw">in</span> <span class="bl">zip</span>(names, ages):
+    <span class="bl">print</span>(<span class="str">f"{name} is {age}"</span>)
+
+<span class="cm"># ── WHILE LOOP ──</span>
+count = <span class="num">1</span>
+<span class="kw">while</span> count <= <span class="num">5</span>:
+    <span class="bl">print</span>(count)
+    count += <span class="num">1</span>
+
+<span class="cm"># ── LOOP CONTROL ──</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bl">range</span>(<span class="num">10</span>):
+    <span class="kw">if</span> i == <span class="num">5</span>: <span class="kw">break</span>     <span class="cm"># Exit loop</span>
+    <span class="kw">if</span> i % <span class="num">2</span> == <span class="num">0</span>: <span class="kw">continue</span>  <span class="cm"># Skip iteration</span>
+    <span class="bl">print</span>(i)
+
+<span class="cm"># Nested loops</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bl">range</span>(<span class="num">1</span>, <span class="num">4</span>):
+    <span class="kw">for</span> j <span class="kw">in</span> <span class="bl">range</span>(<span class="num">1</span>, <span class="num">4</span>):
+        <span class="bl">print</span>(<span class="str">f"{i} x {j} = {i*j}"</span>)
+
+<span class="cm"># else with loop (runs if no break)</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bl">range</span>(<span class="num">5</span>):
+    <span class="bl">print</span>(i)
+<span class="kw">else</span>:
+    <span class="bl">print</span>(<span class="str">"Loop completed"</span>)</pre>
+                </div>
+                <div class="section-label">🧪 Challenges</div>
+                <div class="challenges-grid">
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 1</div>
+                        <div class="challenge-title">Multiplication Table</div>
+                        <div class="challenge-desc">Print multiplication table 1–10 for a given number. Also print the
+                            total sum.</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre>n = <span class="bl">int</span>(<span class="bl">input</span>(<span class="str">"Enter number: "</span>))
+total = <span class="num">0</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bl">range</span>(<span class="num">1</span>, <span class="num">11</span>):
+    result = n * i
+    total += result
+    <span class="bl">print</span>(<span class="str">f"{n} x {i} = {result}"</span>)
+<span class="bl">print</span>(<span class="str">f"Total sum = {total}"</span>)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 2</div>
+                        <div class="challenge-title">Number Guessing Game</div>
+                        <div class="challenge-desc">Secret = 42. Keep asking until correct. Give "Too high" or "Too low"
+                            hints. Count attempts.</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre>secret, attempts = <span class="num">42</span>, <span class="num">0</span>
+<span class="kw">while</span> <span class="kw">True</span>:
+    guess = <span class="bl">int</span>(<span class="bl">input</span>(<span class="str">"Guess: "</span>))
+    attempts += <span class="num">1</span>
+    <span class="kw">if</span> guess < secret:
+        <span class="bl">print</span>(<span class="str">"Too low 📉"</span>)
+    <span class="kw">elif</span> guess > secret:
+        <span class="bl">print</span>(<span class="str">"Too high 📈"</span>)
+    <span class="kw">else</span>:
+        <span class="bl">print</span>(<span class="str">f"🎉 Correct in {attempts} attempts!"</span>)
+        <span class="kw">break</span></pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 3</div>
+                        <div class="challenge-title">Pattern Printing</div>
+                        <div class="challenge-desc">Print star triangle (1 to 5 stars) and number triangle (1 to 1 2 3 4
+                            5) using nested loops.</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre><span class="cm"># Star triangle</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bl">range</span>(<span class="num">1</span>, <span class="num">6</span>):
+    <span class="bl">print</span>(<span class="str">"*"</span> * i)
+
+<span class="bl">print</span>()
+
+<span class="cm"># Number triangle</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bl">range</span>(<span class="num">1</span>, <span class="num">6</span>):
+    <span class="bl">print</span>(<span class="str">" "</span>.join(<span class="bl">str</span>(j) <span class="kw">for</span> j <span class="kw">in</span> <span class="bl">range</span>(<span class="num">1</span>, i+<span class="num">1</span>)))</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <hr class="topic-divider">
+
+            <!-- TOPIC 7: FUNCTIONS -->
+            <section class="topic-section" id="topic7">
+                <div class="topic-header">
+                    <div class="topic-number">TOPIC 07</div>
+                    <div class="topic-title-block">
+                        <div class="topic-title">Functions</div>
+                        <div class="topic-tagline">Reusable blocks of code — def, return, lambda, recursion</div>
+                    </div>
+                </div>
+                <div class="explain-card">
+                    <div class="card-label">📖 Explanation</div>
+                    <p>Functions are <strong style="color:var(--accent)">reusable blocks of code</strong> that perform
+                        specific tasks. Like a recipe — once written, you can use it many times with different inputs.
+                        They help keep code <strong style="color:var(--accent2)">DRY</strong> (Don't Repeat Yourself).
+                    </p>
+                </div>
+                <div class="section-label">💻 Code Examples</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-dots"><span></span><span></span><span></span></div><span
+                            class="code-lang">PYTHON</span><button class="copy-btn"
+                            onclick="copyCode(this)">copy</button>
+                    </div>
+                    <pre><span class="cm"># Basic function</span>
+<span class="kw">def</span> <span class="fn">greet</span>(name=<span class="str">"Guest"</span>):
+    <span class="bl">print</span>(<span class="str">f"Hello {name}!"</span>)
+
+<span class="fn">greet</span>()            <span class="cm"># Hello Guest!</span>
+<span class="fn">greet</span>(<span class="str">"Amit"</span>)      <span class="cm"># Hello Amit!</span>
+
+<span class="cm"># With return</span>
+<span class="kw">def</span> <span class="fn">add</span>(a, b):
+    <span class="kw">return</span> a + b
+
+result = <span class="fn">add</span>(<span class="num">5</span>, <span class="num">3</span>)  <span class="cm"># 8</span>
+
+<span class="cm"># *args — variable positional arguments</span>
+<span class="kw">def</span> <span class="fn">sum_all</span>(*numbers):
+    <span class="kw">return</span> <span class="bl">sum</span>(numbers)
+
+<span class="fn">sum_all</span>(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>)       <span class="cm"># 6</span>
+<span class="fn">sum_all</span>(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>) <span class="cm"># 15</span>
+
+<span class="cm"># **kwargs — variable keyword arguments</span>
+<span class="kw">def</span> <span class="fn">print_info</span>(**kwargs):
+    <span class="kw">for</span> k, v <span class="kw">in</span> kwargs.items():
+        <span class="bl">print</span>(<span class="str">f"{k}: {v}"</span>)
+
+<span class="fn">print_info</span>(name=<span class="str">"Amit"</span>, age=<span class="num">25</span>)
+
+<span class="cm"># Lambda (anonymous one-line function)</span>
+square = <span class="kw">lambda</span> x: x ** <span class="num">2</span>
+<span class="bl">print</span>(square(<span class="num">5</span>))           <span class="cm"># 25</span>
+
+nums = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>]
+squared = <span class="bl">list</span>(<span class="bl">map</span>(<span class="kw">lambda</span> x: x**<span class="num">2</span>, nums))
+evens   = <span class="bl">list</span>(<span class="bl">filter</span>(<span class="kw">lambda</span> x: x%<span class="num">2</span>==<span class="num">0</span>, nums))
+
+<span class="cm"># Recursion (function calling itself)</span>
+<span class="kw">def</span> <span class="fn">factorial</span>(n):
+    <span class="kw">if</span> n == <span class="num">0</span> <span class="kw">or</span> n == <span class="num">1</span>: <span class="kw">return</span> <span class="num">1</span>
+    <span class="kw">return</span> n * <span class="fn">factorial</span>(n - <span class="num">1</span>)
+
+<span class="bl">print</span>(<span class="fn">factorial</span>(<span class="num">5</span>))   <span class="cm"># 120</span>
+
+<span class="cm"># Global vs Local scope</span>
+counter = <span class="num">0</span>
+<span class="kw">def</span> <span class="fn">increment</span>():
+    <span class="kw">global</span> counter
+    counter += <span class="num">1</span>
+<span class="fn">increment</span>(); <span class="bl">print</span>(counter)  <span class="cm"># 1</span></pre>
+                </div>
+                <div class="section-label">🧪 Challenges</div>
+                <div class="challenges-grid">
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 1</div>
+                        <div class="challenge-title">Prime Number Function</div>
+                        <div class="challenge-desc">Write is_prime(n) returning True/False. Use it to print all primes
+                            from 1 to 20.</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre><span class="kw">def</span> <span class="fn">is_prime</span>(n):
+    <span class="kw">if</span> n < <span class="num">2</span>: <span class="kw">return</span> <span class="kw">False</span>
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="bl">range</span>(<span class="num">2</span>, <span class="bl">int</span>(n**<span class="num">0.5</span>)+<span class="num">1</span>):
+        <span class="kw">if</span> n % i == <span class="num">0</span>: <span class="kw">return</span> <span class="kw">False</span>
+    <span class="kw">return</span> <span class="kw">True</span>
+
+primes = [n <span class="kw">for</span> n <span class="kw">in</span> <span class="bl">range</span>(<span class="num">1</span>, <span class="num">21</span>) <span class="kw">if</span> <span class="fn">is_prime</span>(n)]
+<span class="bl">print</span>(primes)  <span class="cm"># [2, 3, 5, 7, 11, 13, 17, 19]</span></pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 2</div>
+                        <div class="challenge-title">Multi-Op Calculator</div>
+                        <div class="challenge-desc">calculator(a, b, operation) — supports add/subtract/multiply/divide.
+                            Handle div by zero.</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre><span class="kw">def</span> <span class="fn">calculator</span>(a, b, op):
+    ops = {
+        <span class="str">'add'</span>:      <span class="kw">lambda</span>: a + b,
+        <span class="str">'subtract'</span>: <span class="kw">lambda</span>: a - b,
+        <span class="str">'multiply'</span>: <span class="kw">lambda</span>: a * b,
+        <span class="str">'divide'</span>:   <span class="kw">lambda</span>: a/b <span class="kw">if</span> b != <span class="num">0</span> <span class="kw">else</span> <span class="str">"Cannot divide by zero"</span>
+    }
+    <span class="kw">return</span> ops.get(op, <span class="kw">lambda</span>: <span class="str">"Invalid op"</span>)()</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 3</div>
+                        <div class="challenge-title">Fibonacci Generator</div>
+                        <div class="challenge-desc">fibonacci(n) returns list of first n Fibonacci numbers: [0, 1, 1, 2,
+                            3, 5, ...]</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre><span class="kw">def</span> <span class="fn">fibonacci</span>(n):
+    fib = [<span class="num">0</span>, <span class="num">1</span>]
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="bl">range</span>(<span class="num">2</span>, n):
+        fib.append(fib[-<span class="num">1</span>] + fib[-<span class="num">2</span>])
+    <span class="kw">return</span> fib[:n]
+
+<span class="bl">print</span>(<span class="fn">fibonacci</span>(<span class="num">10</span>))
+<span class="cm"># [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]</span></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <hr class="topic-divider">
+
+            <!-- TOPIC 8: CLASSES -->
+            <section class="topic-section" id="topic8">
+                <div class="topic-header">
+                    <div class="topic-number">TOPIC 08</div>
+                    <div class="topic-title-block">
+                        <div class="topic-title">Classes & Objects</div>
+                        <div class="topic-tagline">OOP basics — blueprint → instance</div>
+                    </div>
+                </div>
+                <div class="explain-card">
+                    <div class="card-label">📖 Explanation</div>
+                    <p><strong style="color:var(--accent)">Class</strong> is a blueprint or template for creating
+                        objects. <strong style="color:var(--accent2)">Object</strong> is an actual instance of a class.
+                        Like a car design (class) vs actual cars on the road (objects). <code
+                            style="color:var(--accent3)">__init__</code> is the constructor — runs when object is
+                        created.</p>
+                </div>
+                <div class="section-label">💻 Code Examples</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-dots"><span></span><span></span><span></span></div><span
+                            class="code-lang">PYTHON</span><button class="copy-btn"
+                            onclick="copyCode(this)">copy</button>
+                    </div>
+                    <pre><span class="kw">class</span> <span class="cls">Car</span>:
+    wheels = <span class="num">4</span>           <span class="cm"># Class attribute (shared)</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, brand, color, price):
+        self.brand = brand   <span class="cm"># Instance attributes (unique)</span>
+        self.color = color
+        self.price = price
+
+    <span class="kw">def</span> <span class="fn">start</span>(self):
+        <span class="bl">print</span>(<span class="str">f"{self.brand} is starting..."</span>)
+
+    <span class="kw">def</span> <span class="fn">display_info</span>(self):
+        <span class="bl">print</span>(<span class="str">f"Brand: {self.brand} | Color: {self.color}"</span>)
+        <span class="bl">print</span>(<span class="str">f"Price: ₹{self.price} | Wheels: {self.wheels}"</span>)
+
+<span class="cm"># Creating objects</span>
+car1 = <span class="cls">Car</span>(<span class="str">"Toyota"</span>, <span class="str">"Red"</span>, <span class="num">1000000</span>)
+car2 = <span class="cls">Car</span>(<span class="str">"Honda"</span>, <span class="str">"Blue"</span>, <span class="num">1200000</span>)
+
+car1.start()          <span class="cm"># Toyota is starting...</span>
+car1.display_info()
+car1.color = <span class="str">"Black"</span>  <span class="cm"># Modify attribute</span>
+
+<span class="cm"># Class with methods</span>
+<span class="kw">class</span> <span class="cls">Student</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, name, marks):
+        self.name   = name
+        self.marks  = marks
+        self.passed = marks >= <span class="num">33</span>
+
+    <span class="kw">def</span> <span class="fn">get_grade</span>(self):
+        <span class="kw">if</span> self.marks >= <span class="num">90</span>: <span class="kw">return</span> <span class="str">"A+"</span>
+        <span class="kw">elif</span> self.marks >= <span class="num">80</span>: <span class="kw">return</span> <span class="str">"A"</span>
+        <span class="kw">elif</span> self.marks >= <span class="num">33</span>: <span class="kw">return</span> <span class="str">"Pass"</span>
+        <span class="kw">else</span>: <span class="kw">return</span> <span class="str">"Fail"</span>
+
+<span class="cm"># Objects in list</span>
+students = [<span class="cls">Student</span>(<span class="str">"Amit"</span>, <span class="num">85</span>), <span class="cls">Student</span>(<span class="str">"Raj"</span>, <span class="num">45</span>)]
+<span class="kw">for</span> s <span class="kw">in</span> students:
+    <span class="bl">print</span>(<span class="str">f"{s.name}: {s.get_grade()}"</span>)
+
+<span class="cm"># Class variable counter</span>
+<span class="kw">class</span> <span class="cls">Employee</span>:
+    count = <span class="num">0</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, name):
+        self.name = name
+        <span class="cls">Employee</span>.count += <span class="num">1</span></pre>
+                </div>
+                <div class="section-label">🧪 Challenges</div>
+                <div class="challenges-grid">
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 1</div>
+                        <div class="challenge-title">Bank Account Class</div>
+                        <div class="challenge-desc">Attributes: account_number, holder, balance. Methods: deposit,
+                            withdraw (check balance), get_balance, display.</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre><span class="kw">class</span> <span class="cls">BankAccount</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, acc, name, bal=<span class="num">0</span>):
+        self.acc = acc; self.name = name; self.bal = bal
+
+    <span class="kw">def</span> <span class="fn">deposit</span>(self, amt):
+        <span class="kw">if</span> amt > <span class="num">0</span>: self.bal += amt
+        <span class="bl">print</span>(<span class="str">f"Deposited ₹{amt}. Balance: ₹{self.bal}"</span>)
+
+    <span class="kw">def</span> <span class="fn">withdraw</span>(self, amt):
+        <span class="kw">if</span> amt <= self.bal:
+            self.bal -= amt
+            <span class="bl">print</span>(<span class="str">f"Withdrew ₹{amt}. Balance: ₹{self.bal}"</span>)
+        <span class="kw">else</span>: <span class="bl">print</span>(<span class="str">"Insufficient balance"</span>)
+
+    <span class="kw">def</span> <span class="fn">get_balance</span>(self): <span class="kw">return</span> self.bal</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 2</div>
+                        <div class="challenge-title">Student Management</div>
+                        <div class="challenge-desc">Student class with roll_no, name, marks (list of 3). Methods:
+                            total_marks, percentage, grade, display.</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre><span class="kw">class</span> <span class="cls">Student</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, roll, name, marks):
+        self.roll = roll; self.name = name; self.marks = marks
+
+    <span class="kw">def</span> <span class="fn">total_marks</span>(self): <span class="kw">return</span> <span class="bl">sum</span>(self.marks)
+    <span class="kw">def</span> <span class="fn">percentage</span>(self): <span class="kw">return</span> self.total_marks() / <span class="bl">len</span>(self.marks)
+    <span class="kw">def</span> <span class="fn">grade</span>(self):
+        p = self.percentage()
+        <span class="kw">return</span> <span class="str">"A"</span> <span class="kw">if</span> p>=<span class="num">80</span> <span class="kw">else</span> <span class="str">"B"</span> <span class="kw">if</span> p>=<span class="num">60</span> <span class="kw">else</span> <span class="str">"C"</span> <span class="kw">if</span> p>=<span class="num">40</span> <span class="kw">else</span> <span class="str">"F"</span>
+    <span class="kw">def</span> <span class="fn">display</span>(self):
+        <span class="bl">print</span>(<span class="str">f"{self.name} | {self.percentage():.1f}% | {self.grade()}"</span>)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="challenge-card">
+                        <div class="challenge-badge">⚡ Challenge 3</div>
+                        <div class="challenge-title">Library Book System</div>
+                        <div class="challenge-desc">Book class: title, author, isbn, is_available. Methods: borrow,
+                            return_book, display.</div>
+                        <button class="challenge-expand" onclick="toggleChallenge(this)">▶ Show Solution</button>
+                        <div class="challenge-code">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-dots"><span></span><span></span><span></span></div><span
+                                        class="code-lang">SOLUTION</span><button class="copy-btn"
+                                        onclick="copyCode(this)">copy</button>
+                                </div>
+                                <pre><span class="kw">class</span> <span class="cls">Book</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, title, author, isbn):
+        self.title = title; self.author = author
+        self.isbn = isbn; self.is_available = <span class="kw">True</span>
+
+    <span class="kw">def</span> <span class="fn">borrow</span>(self):
+        <span class="kw">if</span> self.is_available:
+            self.is_available = <span class="kw">False</span>; <span class="bl">print</span>(<span class="str">f"📗 '{self.title}' borrowed"</span>)
+        <span class="kw">else</span>: <span class="bl">print</span>(<span class="str">"Not available"</span>)
+
+    <span class="kw">def</span> <span class="fn">return_book</span>(self):
+        self.is_available = <span class="kw">True</span>; <span class="bl">print</span>(<span class="str">f"📗 '{self.title}' returned"</span>)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <hr class="topic-divider">
+
+            <!-- TOPIC 9: ENCAPSULATION -->
+            <section class="topic-section" id="topic9">
+                <div class="topic-header">
+                    <div class="topic-number">TOPIC 09</div>
+                    <div class="topic-title-block">
+                        <div class="topic-title">Encapsulation</div>
+                        <div class="topic-tagline">Data hiding — public, protected, private</div>
+                    </div>
+                </div>
+                <div class="explain-card">
+                    <div class="card-label">📖 Explanation</div>
+                    <p>Encapsulation means <strong style="color:var(--accent)">wrapping data and methods
+                            together</strong> and restricting direct access. Like a capsule — you only see what's
+                        necessary. Python uses naming conventions: <code style="color:var(--accent2)">self._var</code>
+                        (protected), <code style="color:var(--accent2)">self.__var</code> (private).</p>
+                </div>
+                <div class="section-label">💻 Code Examples</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-dots"><span></span><span></span><span></span></div><span
+                            class="code-lang">PYTHON</span><button class="copy-btn"
+                            onclick="copyCode(this)">copy</button>
+                    </div>
+                    <pre><span class="kw">class</span> <span class="cls">BankAccount</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, acc, name, bal=<span class="num">0</span>):
+        self.account_number  = acc         <span class="cm"># Public</span>
+        self.holder_name     = name        <span class="cm"># Public</span>
+        self.__balance       = bal         <span class="cm"># Private (double underscore)</span>
+        self.__history       = []          <span class="cm"># Private</span>
+
+    <span class="kw">def</span> <span class="fn">deposit</span>(self, amount):
+        <span class="kw">if</span> amount > <span class="num">0</span>:
+            self.__balance += amount
+            self.__history.append(<span class="str">f"+ ₹{amount}"</span>)
+            <span class="bl">print</span>(<span class="str">f"Deposited. Balance: ₹{self.__balance}"</span>)
+
+    <span class="kw">def</span> <span class="fn">get_balance</span>(self):       <span class="cm"># Getter</span>
+        <span class="kw">return</span> self.__balance
+
+    <span class="kw">def</span> <span class="fn">show_history</span>(self):
+        <span class="kw">for</span> tx <span class="kw">in</span> self.__history:
+            <span class="bl">print</span>(<span class="str">f"  {tx}"</span>)
+
+<span class="cm"># account.__balance  ← AttributeError!</span>
+<span class="cm"># account.get_balance()  ← Correct way</span>
+
+<span class="cm"># Property decorator (Pythonic getter/setter)</span>
+<span class="kw">class</span> <span class="cls">Temperature</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, celsius):
+        self._celsius = celsius
+
+    <span class="dec">@property</span>
+    <span class="kw">def</span> <span class="fn">celsius</span>(self):              <span class="cm"># Getter</span>
+        <span class="kw">return</span> self._celsius
+
+    <span class="dec">@celsius.setter</span>
+    <span class="kw">def</span> <span class="fn">celsius</span>(self, value):        <span class="cm"># Setter with validation</span>
+        <span class="kw">if</span> value < -<span class="num">273.15</span>:
+            <span class="bl">print</span>(<span class="str">"Below absolute zero!"</span>)
+        <span class="kw">else</span>:
+            self._celsius = value
+
+    <span class="dec">@property</span>
+    <span class="kw">def</span> <span class="fn">fahrenheit</span>(self):           <span class="cm"># Computed property</span>
+        <span class="kw">return</span> (self._celsius * <span class="num">9</span>/<span class="num">5</span>) + <span class="num">32</span>
+
+temp = <span class="cls">Temperature</span>(<span class="num">25</span>)
+<span class="bl">print</span>(temp.celsius)     <span class="cm"># 25</span>
+temp.celsius = <span class="num">30</span>        <span class="cm"># Uses setter</span>
+<span class="bl">print</span>(temp.fahrenheit)  <span class="cm"># 86.0</span></pre>
+                </div>
+                <div class="section-label">🔑 Access Modifiers</div>
+                <div class="table-wrap">
+                    <table class="concept-table">
+                        <thead>
+                            <tr>
+                                <th>Modifier</th>
+                                <th>Syntax</th>
+                                <th>Access Level</th>
+                                <th>Use Case</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Public</td>
+                                <td><span class="tag">self.name</span></td>
+                                <td>Anywhere</td>
+                                <td>General data</td>
+                            </tr>
+                            <tr>
+                                <td>Protected</td>
+                                <td><span class="tag">self._name</span></td>
+                                <td>Class + Subclasses</td>
+                                <td>Internal (convention)</td>
+                            </tr>
+                            <tr>
+                                <td>Private</td>
+                                <td><span class="tag">self.__name</span></td>
+                                <td>Only within class</td>
+                                <td>Sensitive data</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <hr class="topic-divider">
+
+            <!-- TOPIC 10: INHERITANCE -->
+            <section class="topic-section" id="topic10">
+                <div class="topic-header">
+                    <div class="topic-number">TOPIC 10</div>
+                    <div class="topic-title-block">
+                        <div class="topic-title">Inheritance</div>
+                        <div class="topic-tagline">Child class acquires parent's properties — super(), MRO</div>
+                    </div>
+                </div>
+                <div class="explain-card">
+                    <div class="card-label">📖 Explanation</div>
+                    <p>Inheritance allows a <strong style="color:var(--accent)">child class to inherit properties and
+                            methods</strong> from a parent class. Like a child inheriting traits from parents — you get
+                        existing features and can add or override them. <code
+                            style="color:var(--accent2)">super()</code> calls the parent class.</p>
+                </div>
+                <div class="section-label">💻 Code Examples</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-dots"><span></span><span></span><span></span></div><span
+                            class="code-lang">PYTHON</span><button class="copy-btn"
+                            onclick="copyCode(this)">copy</button>
+                    </div>
+                    <pre><span class="cm"># Single Inheritance</span>
+<span class="kw">class</span> <span class="cls">Animal</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, name):
+        self.name = name
+    <span class="kw">def</span> <span class="fn">eat</span>(self): <span class="bl">print</span>(<span class="str">f"{self.name} is eating"</span>)
+    <span class="kw">def</span> <span class="fn">sleep</span>(self): <span class="bl">print</span>(<span class="str">f"{self.name} is sleeping"</span>)
+
+<span class="kw">class</span> <span class="cls">Dog</span>(<span class="cls">Animal</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, name, breed):
+        <span class="bl">super</span>().__init__(name)  <span class="cm"># Call parent constructor</span>
+        self.breed = breed
+
+    <span class="kw">def</span> <span class="fn">eat</span>(self):            <span class="cm"># Override parent method</span>
+        <span class="bl">print</span>(<span class="str">f"{self.name} eats dog food"</span>)
+
+    <span class="kw">def</span> <span class="fn">bark</span>(self):           <span class="cm"># New method</span>
+        <span class="bl">print</span>(<span class="str">f"{self.name} says Woof!"</span>)
+
+dog = <span class="cls">Dog</span>(<span class="str">"Bruno"</span>, <span class="str">"Lab"</span>)
+dog.eat()    <span class="cm"># Bruno eats dog food (overridden)</span>
+dog.sleep()  <span class="cm"># Bruno is sleeping (inherited)</span>
+dog.bark()   <span class="cm"># Bruno says Woof!</span>
+
+<span class="cm"># Multilevel Inheritance</span>
+<span class="kw">class</span> <span class="cls">Vehicle</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, brand): self.brand = brand
+    <span class="kw">def</span> <span class="fn">start</span>(self): <span class="bl">print</span>(<span class="str">f"{self.brand} starting"</span>)
+
+<span class="kw">class</span> <span class="cls">Car</span>(<span class="cls">Vehicle</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, brand, model):
+        <span class="bl">super</span>().__init__(brand); self.model = model
+
+<span class="kw">class</span> <span class="cls">ElectricCar</span>(<span class="cls">Car</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, brand, model, battery):
+        <span class="bl">super</span>().__init__(brand, model); self.battery = battery
+    <span class="kw">def</span> <span class="fn">start</span>(self): <span class="bl">print</span>(<span class="str">f"{self.model} starts silently ⚡"</span>)
+
+tesla = <span class="cls">ElectricCar</span>(<span class="str">"Tesla"</span>, <span class="str">"Model 3"</span>, <span class="num">75</span>)
+tesla.start()
+
+<span class="cm"># Check types</span>
+<span class="bl">print</span>(<span class="bl">isinstance</span>(tesla, <span class="cls">ElectricCar</span>))  <span class="cm"># True</span>
+<span class="bl">print</span>(<span class="bl">isinstance</span>(tesla, <span class="cls">Vehicle</span>))      <span class="cm"># True (grandparent)</span>
+<span class="bl">print</span>(<span class="bl">issubclass</span>(<span class="cls">ElectricCar</span>, <span class="cls">Car</span>))    <span class="cm"># True</span></pre>
+                </div>
+                <div class="section-label">🔑 Inheritance Types</div>
+                <div class="table-wrap">
+                    <table class="concept-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Single</td>
+                                <td>One parent → one child</td>
+                                <td><span class="tag">class Dog(Animal)</span></td>
+                            </tr>
+                            <tr>
+                                <td>Multiple</td>
+                                <td>Multiple parents</td>
+                                <td><span class="tag">class Child(Father, Mother)</span></td>
+                            </tr>
+                            <tr>
+                                <td>Multilevel</td>
+                                <td>Chain of inheritance</td>
+                                <td><span class="tag">GrandParent→Parent→Child</span></td>
+                            </tr>
+                            <tr>
+                                <td>Hierarchical</td>
+                                <td>One parent, multiple children</td>
+                                <td><span class="tag">Animal→Dog, Cat, Bird</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <hr class="topic-divider">
+
+            <!-- TOPIC 11: POLYMORPHISM -->
+            <section class="topic-section" id="topic11">
+                <div class="topic-header">
+                    <div class="topic-number">TOPIC 11</div>
+                    <div class="topic-title-block">
+                        <div class="topic-title">Polymorphism</div>
+                        <div class="topic-tagline">Same name, different behavior — duck typing, operator overloading
+                        </div>
+                    </div>
+                </div>
+                <div class="explain-card">
+                    <div class="card-label">📖 Explanation</div>
+                    <p>Polymorphism means <strong style="color:var(--accent)">same method name, different
+                            behavior</strong>. Like a <code>sound()</code> method — a dog barks, a cat meows, a cow
+                        moos. Python also supports <strong style="color:var(--accent2)">operator overloading</strong>
+                        via magic methods like <code>__add__</code>, <code>__str__</code>.</p>
+                </div>
+                <div class="section-label">💻 Code Examples</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-dots"><span></span><span></span><span></span></div><span
+                            class="code-lang">PYTHON</span><button class="copy-btn"
+                            onclick="copyCode(this)">copy</button>
+                    </div>
+                    <pre><span class="cm"># Method Overriding</span>
+<span class="kw">class</span> <span class="cls">Animal</span>:
+    <span class="kw">def</span> <span class="fn">make_sound</span>(self): <span class="bl">print</span>(<span class="str">"Generic sound"</span>)
+
+<span class="kw">class</span> <span class="cls">Dog</span>(<span class="cls">Animal</span>):
+    <span class="kw">def</span> <span class="fn">make_sound</span>(self): <span class="bl">print</span>(<span class="str">"Woof!"</span>)
+
+<span class="kw">class</span> <span class="cls">Cat</span>(<span class="cls">Animal</span>):
+    <span class="kw">def</span> <span class="fn">make_sound</span>(self): <span class="bl">print</span>(<span class="str">"Meow!"</span>)
+
+<span class="kw">for</span> animal <span class="kw">in</span> [<span class="cls">Dog</span>(), <span class="cls">Cat</span>(), <span class="cls">Animal</span>()]:
+    animal.make_sound()   <span class="cm"># Woof! / Meow! / Generic sound</span>
+
+<span class="cm"># Operator Overloading</span>
+<span class="kw">class</span> <span class="cls">Vector</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, x, y):
+        self.x = x; self.y = y
+
+    <span class="kw">def</span> <span class="fn">__add__</span>(self, other):   <span class="cm"># + operator</span>
+        <span class="kw">return</span> <span class="cls">Vector</span>(self.x + other.x, self.y + other.y)
+
+    <span class="kw">def</span> <span class="fn">__eq__</span>(self, other):    <span class="cm"># == operator</span>
+        <span class="kw">return</span> self.x == other.x <span class="kw">and</span> self.y == other.y
+
+    <span class="kw">def</span> <span class="fn">__str__</span>(self):          <span class="cm"># print()</span>
+        <span class="kw">return</span> <span class="str">f"Vector({self.x}, {self.y})"</span>
+
+v1 = <span class="cls">Vector</span>(<span class="num">2</span>, <span class="num">3</span>); v2 = <span class="cls">Vector</span>(<span class="num">1</span>, <span class="num">4</span>)
+<span class="bl">print</span>(v1 + v2)        <span class="cm"># Vector(3, 7)</span>
+<span class="bl">print</span>(v1 == v2)       <span class="cm"># False</span>
+
+<span class="cm"># Abstract Classes (force implementation)</span>
+<span class="kw">from</span> abc <span class="kw">import</span> ABC, abstractmethod
+
+<span class="kw">class</span> <span class="cls">Payment</span>(<span class="cls">ABC</span>):
+    <span class="dec">@abstractmethod</span>
+    <span class="kw">def</span> <span class="fn">pay</span>(self, amount): <span class="kw">pass</span>
+
+<span class="kw">class</span> <span class="cls">CreditCard</span>(<span class="cls">Payment</span>):
+    <span class="kw">def</span> <span class="fn">pay</span>(self, amount):
+        <span class="bl">print</span>(<span class="str">f"💳 Paying ₹{amount} via Credit Card"</span>)
+
+<span class="kw">class</span> <span class="cls">UPI</span>(<span class="cls">Payment</span>):
+    <span class="kw">def</span> <span class="fn">pay</span>(self, amount):
+        <span class="bl">print</span>(<span class="str">f"📱 Paying ₹{amount} via UPI"</span>)
+
+<span class="kw">for</span> method <span class="kw">in</span> [<span class="cls">CreditCard</span>(), <span class="cls">UPI</span>()]:
+    method.pay(<span class="num">1000</span>)</pre>
+                </div>
+            </section>
+            <hr class="topic-divider">
+
+            <!-- TOPIC 12: ABSTRACTION -->
+            <section class="topic-section" id="topic12">
+                <div class="topic-header">
+                    <div class="topic-number">TOPIC 12</div>
+                    <div class="topic-title-block">
+                        <div class="topic-title">Abstraction</div>
+                        <div class="topic-tagline">Hide complexity, show only essentials — ABC, @abstractmethod</div>
+                    </div>
+                </div>
+                <div class="explain-card">
+                    <div class="card-label">📖 Explanation</div>
+                    <p>Abstraction means <strong style="color:var(--accent)">hiding complex implementation</strong> and
+                        showing only essential features. Like a car's steering wheel — you don't need to know how the
+                        engine works to drive. Use <code style="color:var(--accent2)">ABC</code> and <code
+                            style="color:var(--accent2)">@abstractmethod</code> to enforce this contract.</p>
+                </div>
+                <div class="section-label">💻 Code Examples</div>
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-dots"><span></span><span></span><span></span></div><span
+                            class="code-lang">PYTHON</span><button class="copy-btn"
+                            onclick="copyCode(this)">copy</button>
+                    </div>
+                    <pre><span class="kw">from</span> abc <span class="kw">import</span> ABC, abstractmethod
+
+<span class="kw">class</span> <span class="cls">Vehicle</span>(<span class="cls">ABC</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, brand): self.brand = brand
+
+    <span class="dec">@abstractmethod</span>
+    <span class="kw">def</span> <span class="fn">start</span>(self): <span class="kw">pass</span>       <span class="cm"># Must implement in child</span>
+
+    <span class="dec">@abstractmethod</span>
+    <span class="kw">def</span> <span class="fn">stop</span>(self): <span class="kw">pass</span>
+
+    <span class="kw">def</span> <span class="fn">get_brand</span>(self):         <span class="cm"># Concrete method</span>
+        <span class="kw">return</span> self.brand
+
+<span class="cm"># v = Vehicle("Toyota")  ← TypeError! Can't instantiate abstract</span>
+
+<span class="kw">class</span> <span class="cls">Car</span>(<span class="cls">Vehicle</span>):
+    <span class="kw">def</span> <span class="fn">start</span>(self): <span class="bl">print</span>(<span class="str">f"{self.brand} car engine starts 🔑"</span>)
+    <span class="kw">def</span> <span class="fn">stop</span>(self):  <span class="bl">print</span>(<span class="str">f"{self.brand} car stops ⛔"</span>)
+
+<span class="kw">class</span> <span class="cls">ElectricCar</span>(<span class="cls">Vehicle</span>):
+    <span class="kw">def</span> <span class="fn">start</span>(self): <span class="bl">print</span>(<span class="str">f"{self.brand} starts silently ⚡"</span>)
+    <span class="kw">def</span> <span class="fn">stop</span>(self):  <span class="bl">print</span>(<span class="str">f"{self.brand} regen braking 🔋"</span>)
+
+<span class="kw">for</span> v <span class="kw">in</span> [<span class="cls">Car</span>(<span class="str">"Toyota"</span>), <span class="cls">ElectricCar</span>(<span class="str">"Tesla"</span>)]:
+    v.start(); v.stop()
+
+<span class="cm"># Real world: Database abstraction</span>
+<span class="kw">class</span> <span class="cls">Database</span>(<span class="cls">ABC</span>):
+    <span class="dec">@abstractmethod</span>
+    <span class="kw">def</span> <span class="fn">connect</span>(self): <span class="kw">pass</span>
+    <span class="dec">@abstractmethod</span>
+    <span class="kw">def</span> <span class="fn">execute</span>(self, query): <span class="kw">pass</span>
+    <span class="kw">def</span> <span class="fn">run</span>(self, query):   <span class="cm"># Template method</span>
+        self.connect(); <span class="kw">return</span> self.execute(query)
+
+<span class="kw">class</span> <span class="cls">MySQL</span>(<span class="cls">Database</span>):
+    <span class="kw">def</span> <span class="fn">connect</span>(self): <span class="bl">print</span>(<span class="str">"Connecting MySQL..."</span>)
+    <span class="kw">def</span> <span class="fn">execute</span>(self, q): <span class="bl">print</span>(<span class="str">f"MySQL: {q}"</span>)
+
+<span class="kw">class</span> <span class="cls">PostgreSQL</span>(<span class="cls">Database</span>):
+    <span class="kw">def</span> <span class="fn">connect</span>(self): <span class="bl">print</span>(<span class="str">"Connecting Postgres..."</span>)
+    <span class="kw">def</span> <span class="fn">execute</span>(self, q): <span class="bl">print</span>(<span class="str">f"Postgres: {q}"</span>)</pre>
+                </div>
+                <div class="section-label">🔑 Key Concepts</div>
+                <div class="table-wrap">
+                    <table class="concept-table">
+                        <thead>
+                            <tr>
+                                <th>Concept</th>
+                                <th>Explanation</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Abstract Class</td>
+                                <td>Cannot be instantiated</td>
+                                <td><span class="tag">class Vehicle(ABC):</span></td>
+                            </tr>
+                            <tr>
+                                <td>Abstract Method</td>
+                                <td>No body — must be overridden</td>
+                                <td><span class="tag">@abstractmethod</span></td>
+                            </tr>
+                            <tr>
+                                <td>Concrete Method</td>
+                                <td>Normal method with body</td>
+                                <td>Can be inherited as-is</td>
+                            </tr>
+                            <tr>
+                                <td>ABC Module</td>
+                                <td>Provides abstract base classes</td>
+                                <td><span class="tag">from abc import ABC</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <hr class="topic-divider">
+
+            <!-- QUICK REFERENCE -->
+            <section class="topic-section" id="quickref">
+                <div class="topic-header">
+                    <div class="topic-number">QR</div>
+                    <div class="topic-title-block">
+                        <div class="topic-title">Quick Reference</div>
+                        <div class="topic-tagline">Core syntax at a glance</div>
+                    </div>
+                </div>
+                <div class="quickref-grid">
+                    <div class="qr-card">
+                        <div class="qr-topic">Variable</div>
+                        <div class="qr-code">x = 5</div>
+                    </div>
+                    <div class="qr-card">
+                        <div class="qr-topic">String</div>
+                        <div class="qr-code">s = "hello"</div>
+                    </div>
+                    <div class="qr-card">
+                        <div class="qr-topic">List</div>
+                        <div class="qr-code">[1, 2, 3]</div>
+                    </div>
+                    <div class="qr-card">
+                        <div class="qr-topic">Dict</div>
+                        <div class="qr-code">{'a': 1}</div>
+                    </div>
+                    <div class="qr-card">
+                        <div class="qr-topic">Tuple</div>
+                        <div class="qr-code">(1, 2, 3)</div>
+                    </div>
+                    <div class="qr-card">
+                        <div class="qr-topic">Set</div>
+                        <div class="qr-code">{1, 2, 3}</div>
+                    </div>
+                    <div class="qr-card">
+                        <div class="qr-topic">If Statement</div>
+                        <div class="qr-code">if x > 5:</div>
+                    </div>
+                    <div class="qr-card">
+                        <div class="qr-topic">For Loop</div>
+                        <div class="qr-code">for i in range():</div>
+                    </div>
+                    <div class="qr-card">
+                        <div class="qr-topic">While Loop</div>
+                        <div class="qr-code">while condition:</div>
+                    </div>
+                    <div class="qr-card">
+                        <div class="qr-topic">Function</div>
+                        <div class="qr-code">def func():</div>
+                    </div>
+                    <div class="qr-card">
+                        <div class="qr-topic">Lambda</div>
+                        <div class="qr-code">lambda x: x*2</div>
+                    </div>
+                    <div class="qr-card">
+                        <div class="qr-topic">Class</div>
+                        <div class="qr-code">class MyClass:</div>
+                    </div>
+                    <div class="qr-card">
+                        <div class="qr-topic">Constructor</div>
+                        <div class="qr-code">def __init__(self):</div>
+                    </div>
+                    <div class="qr-card">
+                        <div class="qr-topic">Inheritance</div>
+                        <div class="qr-code">class Child(Parent):</div>
+                    </div>
+                    <div class="qr-card">
+                        <div class="qr-topic">Abstract</div>
+                        <div class="qr-code">@abstractmethod</div>
+                    </div>
+                    <div class="qr-card">
+                        <div class="qr-topic">Private</div>
+                        <div class="qr-code">self.__var</div>
+                    </div>
+                    <div class="qr-card">
+                        <div class="qr-topic">Super</div>
+                        <div class="qr-code">super().__init__()</div>
+                    </div>
+                    <div class="qr-card">
+                        <div class="qr-topic">List Comp</div>
+                        <div class="qr-code">[x for x in lst]</div>
+                    </div>
+                </div>
+            </section>
+
+        </div><!-- /content -->
+    </main>
+
+    <!-- BACK TO TOP -->
+    <button id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+
+    <script>
+        // ── MOBILE MENU ──
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        menuBtn.addEventListener('click', () => {
+            const open = sidebar.classList.toggle('open');
+            menuBtn.classList.toggle('open', open);
+            overlay.classList.toggle('show', open);
+        });
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            menuBtn.classList.remove('open');
+            overlay.classList.remove('show');
+        });
+
+        // ── PROGRESS BAR ──
+        const fill = document.getElementById('progressFill');
+        window.addEventListener('scroll', () => {
+            const el = document.documentElement;
+            const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+            fill.style.width = pct + '%';
+            // back to top
+            document.getElementById('backTop').classList.toggle('show', el.scrollTop > 400);
+        });
+
+        // ── ACTIVE NAV ──
+        const sections = document.querySelectorAll('.topic-section');
+        const navItems = document.querySelectorAll('.nav-item');
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    const id = e.target.id;
+                    navItems.forEach(n => {
+                        n.classList.toggle('active', n.getAttribute('href') === '#' + id);
+                    });
+                }
+            });
+        }, { threshold: 0.2, rootMargin: '-60px 0px -60px 0px' });
+        sections.forEach(s => observer.observe(s));
+
+        // ── SCROLL REVEAL ──
+        const revealObs = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: 0.08 });
+        sections.forEach(s => revealObs.observe(s));
+
+        // ── COPY CODE ──
+        function copyCode(btn) {
+            const pre = btn.closest('.code-block').querySelector('pre');
+            const text = pre.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = '✓ copied';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
+            });
+        }
+
+        // ── CHALLENGE EXPAND ──
+        function toggleChallenge(btn) {
+            const code = btn.nextElementSibling;
+            const open = code.classList.toggle('open');
+            btn.textContent = open ? '▼ Hide Solution' : '▶ Show Solution';
+        }
+
+        // ── SEARCH ──
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', () => {
+            const q = searchInput.value.toLowerCase();
+            navItems.forEach(item => {
+                const matches = item.textContent.toLowerCase().includes(q);
+                item.style.display = matches ? '' : 'none';
+            });
+        });
+
+        // ── SMOOTH CLOSE SIDEBAR ON NAV CLICK (mobile) ──
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth <= 900) {
+                    sidebar.classList.remove('open');
+                    menuBtn.classList.remove('open');
+                    overlay.classList.remove('show');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
