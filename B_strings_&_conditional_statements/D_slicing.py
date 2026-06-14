@@ -42,3 +42,7 @@ str = "ApnaCollege"
 #    first_three = str[:3]     # slicing
 #    last_three = str[-3:]     # slicing from end
 
+# Negative Index
+str2 = "Apple"
+print(str[-3:-1])
+print(str[-4:-2])
