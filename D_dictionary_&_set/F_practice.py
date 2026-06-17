@@ -8,3 +8,4 @@ You are given a list of subjects for students. Assume one classroom is required 
 """
 subjects = {"python", "java", "C++", "python", "javascript", "java", "python", "java", "C++", "C"}
 
+print(len(subjects))
