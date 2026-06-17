@@ -1,16 +1,5 @@
 # Dictionary in python
-# nested dictionary
 
-student = {
-    "name" : "amit",
-    "score" : {
-        "chem" : 98,
-        "phy" : 97,
-        "math" : 95
-    }
-}
-
-# Detailed version
 # Nested Dictionary
 
 # A nested dictionary is a dictionary that contains another dictionary as a value
