@@ -11,6 +11,6 @@
 def convert():
     n = float(input("How many dollors you want ot convert? :"))
     inr = float(input("What's the current inr value? :"))
-    print(f"{n} $ is total {inr*n} Rs")
+    print(f"{n} $ is total {inr*n} INR")
 
 convert()
