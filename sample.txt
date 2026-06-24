@@ -1,0 +1,16 @@
+BEEE imp question
+
+1. number system conversion ---------
+2. number system definition
+3. de morgan law
+4. define all logic gates
+5. universal gate (their derivation) -----------
+6. half adder and full adder (give priority to full adder circuit)
+7. SR flip-flop using nor nand and clock (nor is important)
+8. JK flip-flop (important) ------------
+
+1. PN junction
+2. VI characteristics if PN junction diode --------------
+3. BJT configuration --------------
+4. BJT configuration CB, CC, CE (active reason, saturation reason and cutoff reason.)
+5. uses of BJT as an amplifier and inverter and switch
